@@ -1,0 +1,134 @@
+{
+    "package": {
+        "package_name": "net.intellivoid.kimchi_rpc",
+        "name": "KimchiRPC",
+        "version": "1.0.0.0",
+        "author": "Zi Xing Narrakas",
+        "organization": "Intellivoid Technologies",
+        "description": "The RPC server that goes good with anything, even toothpaste!",
+        "url": "https://github.com/intellivoid/KimchiRPC",
+        "dependencies": [
+            {
+                "package": "net.intellivoid.background_worker",
+                "version": "latest",
+                "source": "default@github/intellivoid/BackgroundWorker",
+                "required": true
+            }
+        ],
+        "configuration": {
+            "autoload_method": "generated_spl",
+            "main": null,
+            "post_installation": [],
+            "pre_installation": []
+        }
+    },
+    "components": [
+        {
+            "required": true,
+            "file": "Abstracts/Types/ProtocolType.php"
+        },
+        {
+            "required": true,
+            "file": "Abstracts/ErrorCodes/JsonStandardErrorCodes.php"
+        },
+        {
+            "required": true,
+            "file": "Abstracts/ServerMode.php"
+        },
+        {
+            "required": true,
+            "file": "BuiltinMethods/Ping.php"
+        },
+        {
+            "required": true,
+            "file": "BuiltinMethods/GetRegisteredMethods.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/ParseErrorException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/InvalidRequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/InternalErrorException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/InvalidParametersException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/MethodNotFoundException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/JsonRPC/ServerException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/RequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/MethodAlreadyRegistered.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/MethodNotFoundException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/ServerException.php"
+        },
+        {
+            "required": true,
+            "file": "KimchiRPC.php"
+        },
+        {
+            "required": true,
+            "file": "Utilities/JsonRPC/RequestHandler.php"
+        },
+        {
+            "required": true,
+            "file": "Utilities/Converter.php"
+        },
+        {
+            "required": true,
+            "file": "Interfaces/MethodInterface.php"
+        },
+        {
+            "required": true,
+            "file": "Interfaces/JsonRpcException.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/JsonRPC/Response.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/JsonRPC/Request.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/JsonRPC/Error.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/Response.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/ServerConfiguration.php"
+        },
+        {
+            "required": true,
+            "file": "Objects/Request.php"
+        }
+    ],
+    "files": [
+        "package.json"
+    ]
+}

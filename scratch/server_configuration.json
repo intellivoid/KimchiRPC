@@ -1,0 +1,15 @@
+{
+  "background_worker": {
+    "enabled": true,
+    "acm_name": "example_server_rpc"
+  },
+  "serialization": {
+    "default_format": "json",
+    "enable_json": true,
+    "enable_ziproto": true
+  },
+  "server": {
+
+
+  }
+}
