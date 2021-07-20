@@ -5,6 +5,10 @@
 
     namespace KimchiRPC\Objects\JsonRPC;
 
+    use KimchiRPC\Abstracts\ErrorCodes\JsonStandardErrorCodes;
+    use KimchiRPC\Abstracts\ErrorCodes\ServerErrorCodes;
+    use MongoDB\Driver\Server;
+
     /**
      * Class Response
      * @package KimchiRPC\Objects\JsonRPC
@@ -84,7 +88,7 @@
                 $results["result"] = $this->Result;
             }
 
-            $results["id"] = $this->ID;
+            $results["id"] = (int)$this->ID;
 
             return $results;
         }
@@ -110,5 +114,55 @@
 
             if(isset($data["id"]))
                 $response_object->ID = $data["id"];
+        }
+
+        /**
+         * Constructs a Json RPC response object from a standard server response, also converts server errors to
+         * standard Json RPC errors if applicable
+         *
+         * @param \KimchiRPC\Objects\Response $response
+         * @return Response
+         */
+        public static function fromServerResponse(\KimchiRPC\Objects\Response $response): Response
+        {
+            $response_object = new Response();
+            $response_object->ID = $response->ID;
+
+            if($response->Success == false)
+            {
+                $error_object = new Error();
+                $error_object->Message = $response->ErrorMessage;
+
+                switch($response->ErrorCode)
+                {
+                    case ServerErrorCodes::MalformedRequestException:
+                        $error_object->Code = JsonStandardErrorCodes::ParseError;
+                        break;
+
+                    case ServerErrorCodes::InternalError:
+                        $error_object->Code = JsonStandardErrorCodes::InternalError;
+                        break;
+
+                    case ServerErrorCodes::MethodNotFoundException:
+                        $error_object->Code = JsonStandardErrorCodes::MethodNotFound;
+                        break;
+
+                    case ServerErrorCodes::MissingParameterException:
+                        $error_object->Code = JsonStandardErrorCodes::InvalidParams;
+                        break;
+
+                    case ServerErrorCodes::UnsupportedProtocol:
+                        $error_object->Code = JsonStandardErrorCodes::ServerError;
+                        break;
+                }
+
+                $response_object->Error = $error_object;
+            }
+            else
+            {
+                $response_object->Result = $response->ResultData;
+            }
+
+            return $response_object;
         }
     }

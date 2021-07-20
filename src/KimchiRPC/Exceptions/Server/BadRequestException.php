@@ -10,10 +10,10 @@
     use Throwable;
 
     /**
-     * Class MissingParameterException
+     * Class BadRequestException
      * @package KimchiRPC\Exceptions\Server
      */
-    class MissingParameterException extends Exception
+    class BadRequestException extends Exception
     {
         /**
          * @var Throwable|null
@@ -21,13 +21,13 @@
         private ?Throwable $previous;
 
         /**
-         * MissingParameterException constructor.
+         * BadRequestException constructor.
          * @param string $message
          * @param Throwable|null $previous
          */
         public function __construct($message = "", Throwable $previous = null)
         {
-            parent::__construct($message, ServerErrorCodes::MissingParameterException, $previous);
+            parent::__construct($message, ServerErrorCodes::BadRequestException, $previous);
             $this->message = $message;
             $this->previous = $previous;
         }

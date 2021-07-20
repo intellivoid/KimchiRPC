@@ -10,10 +10,10 @@
     use Throwable;
 
     /**
-     * Class MissingParameterException
+     * Class UnsupportedHttpRequestMethodException
      * @package KimchiRPC\Exceptions\Server
      */
-    class MissingParameterException extends Exception
+    class UnsupportedHttpRequestMethodException extends Exception
     {
         /**
          * @var Throwable|null
@@ -21,13 +21,13 @@
         private ?Throwable $previous;
 
         /**
-         * MissingParameterException constructor.
+         * UnsupportedHttpRequestMethodException constructor.
          * @param string $message
          * @param Throwable|null $previous
          */
         public function __construct($message = "", Throwable $previous = null)
         {
-            parent::__construct($message, ServerErrorCodes::MissingParameterException, $previous);
+            parent::__construct($message, ServerErrorCodes::UnsupportedHttpRequestMethodException, $previous);
             $this->message = $message;
             $this->previous = $previous;
         }

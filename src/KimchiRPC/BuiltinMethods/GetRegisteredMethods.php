@@ -71,8 +71,7 @@
          */
         public function execute(Request $request): Response
         {
-            $response = new Response();
-            $response->Success = true;
+            $response = Response::fromRequest($request);
             $response->ResultData = array_keys($this->kimchiRPC->getRegisteredMethods());
 
             return $response;

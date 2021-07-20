@@ -33,4 +33,19 @@
          * The server doesn't support the requested protocol
          */
         const UnsupportedProtocol = -5604;
+
+        /**
+         * The request the client sent is malformed and couldn't be understood by the server
+         */
+        const MalformedRequestException = -5605;
+
+        /**
+         * The request method used in the http request is not supported
+         */
+        const UnsupportedHttpRequestMethodException = -5606;
+
+        /**
+         * The request made to the server is invalid and contains missing fields
+         */
+        const BadRequestException = -5607;
     }

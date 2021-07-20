@@ -15,6 +15,13 @@
     class Request
     {
         /**
+         * The ID of the request defined by the client
+         *
+         * @var int
+         */
+        public $ID;
+
+        /**
          * The Protocol used to make this request
          *
          * @var string|ProtocolType
@@ -22,7 +29,7 @@
         public $ProtocolType;
 
         /**
-         * The Protocol's request object for this request, reference purposes.
+         * The Protocol's request object represented in the respective object
          *
          * @var null|mixed|\KimchiRPC\Objects\JsonRPC\Request
          */
@@ -56,8 +63,7 @@
             switch($this->ProtocolType)
             {
                 case ProtocolType::JsonRpc2:
-                    /** @var \KimchiRPC\Objects\JsonRPC\Request $protocol_object */
-                    $protocol_object->toArray();
+                    $protocol_object = $this->ProtocolRequestObject->toArray();
                     break;
 
                 default:
@@ -67,15 +73,17 @@
             if($compact)
             {
                 return [
-                    0x001 => $this->ProtocolType,
-                    0x002 => $protocol_object,
-                    0x003 => $this->Method,
-                    0x004 => $this->Parameters
+                    0x001 => $this->ID,
+                    0x002 => $this->ProtocolType,
+                    0x003 => $protocol_object,
+                    0x004 => $this->Method,
+                    0x005 => $this->Parameters
                 ];
             }
             else
             {
                 return [
+                    "id" => $this->ID,
                     "protocol_type" => $this->ProtocolType,
                     "protocol_object" => $protocol_object,
                     "method" => $this->Method,
@@ -95,26 +103,31 @@
         {
             $request_object = new Request();
 
+            if(isset($data["id"]))
+                $request_object->ID = $data["id"];
+            if(isset($data[0x001]))
+                $request_object->ID = $data[0x001];
+            
             if(isset($data["protocol_type"]))
                 $request_object->ProtocolType = $data["protocol_type"];
-            if(isset($data[0x001]))
-                $request_object->ProtocolType = $data[0x001];
+            if(isset($data[0x002]))
+                $request_object->ProtocolType = $data[0x002];
 
             if(isset($data["method"]))
                 $request_object->Method = $data["method"];
-            if(isset($data[0x003]))
-                $request_object->Method = $data[0x003];
+            if(isset($data[0x004]))
+                $request_object->Method = $data[0x004];
 
             if(isset($data["parameters"]))
                 $request_object->Parameters = $data["parameters"];
-            if(isset($data[0x004]))
-                $request_object->Parameters = $data[0x004];
+            if(isset($data[0x005]))
+                $request_object->Parameters = $data[0x005];
 
             $protocol_object = null;
             if(isset($data["protocol_object"]))
                 $protocol_object = $data["protocol_object"];
-            if(isset($data[0x002]))
-                $protocol_object = $data[0x002];
+            if(isset($data[0x003]))
+                $protocol_object = $data[0x003];
 
             if($protocol_object !== null)
             {
@@ -128,6 +141,24 @@
                         throw new ServerException("Cannot construct '" . $request_object->ProtocolType . "' protocol object");
                 }
             }
+
+            return $request_object;
+        }
+
+        /**
+         * Constructs standard request from a Json RPC request
+         *
+         * @param JsonRPC\Request $request
+         * @return Request
+         */
+        public static function fromJsonRpcRequest(\KimchiRPC\Objects\JsonRPC\Request $request): Request
+        {
+            $request_object = new Request();
+            $request_object->ID = $request->ID;
+            $request_object->ProtocolType = ProtocolType::JsonRpc2;
+            $request_object->Method = $request->Method;
+            $request_object->Parameters = $request->Parameters;
+            $request_object->ProtocolRequestObject = $request;
 
             return $request_object;
         }

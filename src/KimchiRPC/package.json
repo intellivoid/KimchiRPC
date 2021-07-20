@@ -25,11 +25,19 @@
     "components": [
         {
             "required": true,
+            "file": "Abstracts/Types/SupportedContentTypes.php"
+        },
+        {
+            "required": true,
             "file": "Abstracts/Types/ProtocolType.php"
         },
         {
             "required": true,
             "file": "Abstracts/ErrorCodes/JsonStandardErrorCodes.php"
+        },
+        {
+            "required": true,
+            "file": "Abstracts/ErrorCodes/ServerErrorCodes.php"
         },
         {
             "required": true,
@@ -77,7 +85,39 @@
         },
         {
             "required": true,
+            "file": "Exceptions/CannotHandleRequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/UnsupportedHttpRequestMethodException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/MissingParameterException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/InternalServerException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/UnsupportedProtocolException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/MalformedRequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/InvalidParametersException.php"
+        },
+        {
+            "required": true,
             "file": "Exceptions/Server/MethodNotFoundException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/Server/BadRequestException.php"
         },
         {
             "required": true,
@@ -94,6 +134,10 @@
         {
             "required": true,
             "file": "Utilities/Converter.php"
+        },
+        {
+            "required": true,
+            "file": "Utilities/Helper.php"
         },
         {
             "required": true,

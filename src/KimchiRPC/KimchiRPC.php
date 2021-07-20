@@ -8,14 +8,23 @@
     use BackgroundWorker\Exceptions\UnexpectedTermination;
     use BackgroundWorker\Exceptions\WorkerException;
     use BackgroundWorker\Exceptions\WorkersAlreadyRunningException;
+    use Exception;
     use GearmanJob;
     use KimchiRPC\Abstracts\ServerMode;
     use KimchiRPC\Abstracts\Types\ProtocolType;
+    use KimchiRPC\Abstracts\Types\SupportedContentTypes;
+    use KimchiRPC\Exceptions\CannotHandleRequestException;
     use KimchiRPC\Exceptions\MethodAlreadyRegistered;
+    use KimchiRPC\Exceptions\Server\MethodNotFoundException;
+    use KimchiRPC\Exceptions\Server\UnsupportedHttpRequestMethodException;
+    use KimchiRPC\Exceptions\Server\UnsupportedProtocolException;
     use KimchiRPC\Exceptions\ServerException;
     use KimchiRPC\Interfaces\MethodInterface;
     use KimchiRPC\Objects\Request;
+    use KimchiRPC\Objects\Response;
     use KimchiRPC\Utilities\Converter;
+    use KimchiRPC\Utilities\Helper;
+    use KimchiRPC\Utilities\JsonRPC\RequestHandler;
     use PpmZiProto\ZiProto;
 
     // TODO: Make server name function safe
@@ -75,6 +84,7 @@
         {
             $this->methods = [];
             $this->server_name = Converter::functionNameSafe($server_name);
+            $this->default_protocol = ProtocolType::JsonRpc2;
             $this->server_mode = ServerMode::Handler;
             $this->worker_initialized = false;
             $this->supervisor_initialized = false;
@@ -122,6 +132,112 @@
                         return ZiProto::encode($method->execute(Request::fromArray(ZiProto::decode($job->workload())))->toArray());
                     }
                 );
+            }
+        }
+
+        /**
+         * Executes a method in the server and returns the response
+         *
+         * @param Request $request
+         * @return Response
+         */
+        public function executeMethod(Request $request): Response
+        {
+            if(isset($this->methods[$request->Method]) == false)
+            {
+                $truncated_method = Converter::truncateString($request->Method, 20);
+                return Response::fromException($request->ProtocolType, $request->ID, new MethodNotFoundException("The requested method '" . $truncated_method . "' was not found."));
+            }
+
+            try
+            {
+                return $this->methods[$request->Method]->execute($request);
+            }
+            catch(Exception $e)
+            {
+                return Response::fromException($request->ProtocolType, $request->ID, $e);
+            }
+        }
+
+        /**
+         * Handles the HTTP request and invokes the method(s) requested
+         *
+         * @return Response[]
+         * @throws CannotHandleRequestException
+         * @throws Exceptions\Server\BadRequestException
+         * @throws UnsupportedHttpRequestMethodException
+         * @throws UnsupportedProtocolException
+         */
+        public function handleRequest(): array
+        {
+            if(http_response_code() == false)
+                throw new CannotHandleRequestException("The method can only be invoked if the instance is running from a web server environment");
+
+            $request_headers = Helper::getRequestHeaders();
+            $protocol = $this->getDefaultProtocol();
+
+            if(isset($request_headers["Content-Type"]))
+            {
+                switch($request_headers["Content-Type"])
+                {
+                    case SupportedContentTypes::JsonRpc:
+                    case SupportedContentTypes::JsonRpc2:
+                    case SupportedContentTypes::JsonRpc3:
+                        $protocol = ProtocolType::JsonRpc2;
+                        break;
+
+                    default:
+                        throw new UnsupportedProtocolException("The server does not support the requested protocol");
+                }
+            }
+
+            $request_batch = [];
+            switch(strtoupper($_SERVER["REQUEST_METHOD"]))
+            {
+                case "POST":
+                    $request_batch = RequestHandler::fromPostRequest();
+                    break;
+
+                case "GET":
+                    $request_batch = RequestHandler::fromGetRequest();
+                    break;
+
+                default:
+                    throw new UnsupportedHttpRequestMethodException("The request method '" . $_SERVER["REQUEST_METHOD"] . "' is not supported");
+            }
+
+            $requests = [];
+            $responses = [];
+            switch($protocol)
+            {
+                case ProtocolType::JsonRpc2:
+                    /** @var \KimchiRPC\Objects\JsonRPC\Request $request */
+                    foreach($request_batch as $request)
+                        $requests[] = Request::fromJsonRpcRequest($request);
+            }
+
+            foreach($requests as $request)
+                $responses[] = $this->executeMethod($request);
+
+            return $responses;
+        }
+
+        /**
+         * Handles a response to the client
+         *
+         * @param string $protocol
+         * @param Response[] $responses
+         */
+        public function handleResponses(string $protocol, array $responses)
+        {
+            switch($protocol)
+            {
+                case ProtocolType::JsonRpc2:
+                    $results = RequestHandler::prepareResponse($responses);
+                    header("Content-Type: " . SupportedContentTypes::JsonRpc2);
+                    print(json_encode($results));
+                    break;
+
             }
         }
 

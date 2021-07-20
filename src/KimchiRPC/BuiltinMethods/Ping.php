@@ -19,8 +19,7 @@
          */
         public function execute(Request $request): Response
         {
-            $response = new Response();
-            $response->Success = true;
+            $response = Response::fromRequest($request);
             $response->ResultData = true;
 
             return $response;

@@ -3,17 +3,16 @@
     /** @noinspection PhpUnused */
     /** @noinspection PhpPropertyOnlyWrittenInspection */
 
-    namespace KimchiRPC\Exceptions\Server;
+    namespace KimchiRPC\Exceptions;
 
     use Exception;
-    use KimchiRPC\Abstracts\ErrorCodes\ServerErrorCodes;
     use Throwable;
 
     /**
-     * Class InternalServerException
-     * @package KimchiRPC\Exceptions\Server
+     * Class CannotHandleRequestException
+     * @package KimchiRPC\Exceptions
      */
-    class InternalServerException extends Exception
+    class CannotHandleRequestException extends Exception
     {
         /**
          * @var Throwable|null
@@ -21,14 +20,16 @@
         private ?Throwable $previous;
 
         /**
-         * InternalServerException constructor.
+         * CannotHandleRequestException constructor.
          * @param string $message
+         * @param int $code
          * @param Throwable|null $previous
          */
-        public function __construct($message = "", Throwable $previous = null)
+        public function __construct($message = "", $code = 0, Throwable $previous = null)
         {
-            parent::__construct($message, ServerErrorCodes::InternalError, $previous);
+            parent::__construct($message, $code, $previous);
             $this->message = $message;
+            $this->code = $code;
             $this->previous = $previous;
         }
     }
