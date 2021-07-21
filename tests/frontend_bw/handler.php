@@ -14,4 +14,4 @@ ini_set('display_errors', '1');
     $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\GetRegisteredMethods($KimchiRPC)); // server.get_registered_methods
 
     // Start working
-$KimchiRPC->handleResponses($KimchiRPC->getDefaultProtocol(), $KimchiRPC->handleRequest());
+    $KimchiRPC->handleResponses($KimchiRPC->handleRequest());

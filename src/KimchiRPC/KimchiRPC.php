@@ -164,8 +164,7 @@
          *
          * @return Response[]
          * @throws CannotHandleRequestException
-         * @throws Exceptions\Server\BadRequestException
-         * @throws UnsupportedHttpRequestMethodException
+         * @throws Exceptions\NoRequestHandlerForProtocolException
          * @throws UnsupportedProtocolException
          */
         public function handleRequest(): array
@@ -174,47 +173,11 @@
                 throw new CannotHandleRequestException("The method can only be invoked if the instance is running from a web server environment");
 
             $request_headers = Helper::getRequestHeaders();
-            $protocol = $this->getDefaultProtocol();
+            $protocol = Helper::detectProtocol($this->getDefaultProtocol());
+            $request_handler = Helper::getRequestHandler($protocol);
+            $requests = $request_handler->fromRequest($_SERVER["REQUEST_METHOD"]);
 
-            if(isset($request_headers["Content-Type"]))
-            {
-                switch($request_headers["Content-Type"])
-                {
-                    case SupportedContentTypes::JsonRpc:
-                    case SupportedContentTypes::JsonRpc2:
-                    case SupportedContentTypes::JsonRpc3:
-                        $protocol = ProtocolType::JsonRpc2;
-                        break;
-
-                    default:
-                        throw new UnsupportedProtocolException("The server does not support the requested protocol");
-                }
-            }
-
-            $request_batch = [];
-            switch(strtoupper($_SERVER["REQUEST_METHOD"]))
-            {
-                case "POST":
-                    $request_batch = RequestHandler::fromPostRequest();
-                    break;
-
-                case "GET":
-                    $request_batch = RequestHandler::fromGetRequest();
-                    break;
-
-                default:
-                    throw new UnsupportedHttpRequestMethodException("The request method '" . $_SERVER["REQUEST_METHOD"] . "' is not supported");
-            }
-
-            $requests = [];
             $responses = [];
-            switch($protocol)
-            {
-                case ProtocolType::JsonRpc2:
-                    /** @var \KimchiRPC\Objects\JsonRPC\Request $request */
-                    foreach($request_batch as $request)
-                        $requests[] = Request::fromJsonRpcRequest($request);
-            }
 
             foreach($requests as $request)
                 $responses[] = $this->executeMethod($request);
@@ -225,15 +188,19 @@
         /**
          * Handles a response to the client
          *
-         * @param string $protocol
          * @param Response[] $responses
+         * @throws Exceptions\NoRequestHandlerForProtocolException
+         * @throws UnsupportedProtocolException
          */
-        public function handleResponses(string $protocol, array $responses)
+        public function handleResponses(array $responses)
         {
+            $protocol = Helper::detectProtocol($this->getDefaultProtocol());
+            $request_handler = Helper::getRequestHandler($protocol);
+
             switch($protocol)
             {
                 case ProtocolType::JsonRpc2:
-                    $results = RequestHandler::prepareResponse($responses);
+                    $results = $request_handler->prepareResponse($responses);
                     header("Content-Type: " . SupportedContentTypes::JsonRpc2);
                     print(json_encode($results));
                     break;

@@ -7,7 +7,6 @@
 
     use KimchiRPC\Abstracts\ErrorCodes\JsonStandardErrorCodes;
     use KimchiRPC\Abstracts\ErrorCodes\ServerErrorCodes;
-    use MongoDB\Driver\Server;
 
     /**
      * Class Response

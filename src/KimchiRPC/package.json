@@ -25,6 +25,10 @@
     "components": [
         {
             "required": true,
+            "file": "Abstracts/Types/RequestMethod.php"
+        },
+        {
+            "required": true,
             "file": "Abstracts/Types/SupportedContentTypes.php"
         },
         {
@@ -42,6 +46,10 @@
         {
             "required": true,
             "file": "Abstracts/ServerMode.php"
+        },
+        {
+            "required": true,
+            "file": "Classes/RequestHandlers/JsonRpcRequestHandler.php"
         },
         {
             "required": true,
@@ -78,6 +86,10 @@
         {
             "required": true,
             "file": "Exceptions/RequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/NoRequestHandlerForProtocolException.php"
         },
         {
             "required": true,
@@ -129,10 +141,6 @@
         },
         {
             "required": true,
-            "file": "Utilities/JsonRPC/RequestHandler.php"
-        },
-        {
-            "required": true,
             "file": "Utilities/Converter.php"
         },
         {
@@ -142,6 +150,10 @@
         {
             "required": true,
             "file": "Interfaces/MethodInterface.php"
+        },
+        {
+            "required": true,
+            "file": "Interfaces/RequestHandlerInterface.php"
         },
         {
             "required": true,
