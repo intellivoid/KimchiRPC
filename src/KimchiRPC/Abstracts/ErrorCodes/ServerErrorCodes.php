@@ -48,4 +48,18 @@
          * The request made to the server is invalid and contains missing fields
          */
         const BadRequestException = -5607;
+
+        /**
+         * All the error codes represented in an array
+         */
+        const AllCodes = [
+            self::InternalError,
+            self::InvalidParametersException,
+            self::MethodNotFoundException,
+            self::MissingParameterException,
+            self::UnsupportedProtocol,
+            self::MalformedRequestException,
+            self::UnsupportedHttpRequestMethodException,
+            self::BadRequestException
+        ];
     }

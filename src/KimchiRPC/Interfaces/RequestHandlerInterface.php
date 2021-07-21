@@ -3,6 +3,10 @@
 
     namespace KimchiRPC\Interfaces;
 
+    use Exception;
+    use KimchiRPC\Exceptions\Server\BadRequestException;
+    use KimchiRPC\Exceptions\Server\MalformedRequestException;
+    use KimchiRPC\Exceptions\Server\UnsupportedHttpRequestMethodException;
     use KimchiRPC\Objects\Request;
     use KimchiRPC\Objects\Response;
 
@@ -44,6 +48,24 @@
          * @param string $request_method
          * @param array $options
          * @return Request[]
+         * @throws Exception
          */
         public function fromRequest(string $request_method, array $options=[]): array;
+
+        /**
+         * Handles the HTTP response and sets the appropriate headers for the client
+         *
+         * @param Response[] $responses
+         * @return mixed
+         */
+        public function handleResponse(array $responses);
+
+        /**
+         * Handles an exception and returns a response of the exception
+         *
+         * @param Exception $e
+         * @param bool $suppress_non_internal Suppresses non-internal errors to a generic server exception error
+         * @return mixed
+         */
+        public function handleException(Exception $e, bool $suppress_non_internal=false);
     }

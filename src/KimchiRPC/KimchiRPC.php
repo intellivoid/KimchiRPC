@@ -8,15 +8,13 @@
     use BackgroundWorker\Exceptions\UnexpectedTermination;
     use BackgroundWorker\Exceptions\WorkerException;
     use BackgroundWorker\Exceptions\WorkersAlreadyRunningException;
-    use Exception;
-    use GearmanJob;
     use KimchiRPC\Abstracts\ServerMode;
     use KimchiRPC\Abstracts\Types\ProtocolType;
     use KimchiRPC\Abstracts\Types\SupportedContentTypes;
     use KimchiRPC\Exceptions\CannotHandleRequestException;
     use KimchiRPC\Exceptions\MethodAlreadyRegistered;
+    use KimchiRPC\Exceptions\MissingComponentsException;
     use KimchiRPC\Exceptions\Server\MethodNotFoundException;
-    use KimchiRPC\Exceptions\Server\UnsupportedHttpRequestMethodException;
     use KimchiRPC\Exceptions\Server\UnsupportedProtocolException;
     use KimchiRPC\Exceptions\ServerException;
     use KimchiRPC\Interfaces\MethodInterface;
@@ -24,11 +22,29 @@
     use KimchiRPC\Objects\Response;
     use KimchiRPC\Utilities\Converter;
     use KimchiRPC\Utilities\Helper;
-    use KimchiRPC\Utilities\JsonRPC\RequestHandler;
     use PpmZiProto\ZiProto;
+    use RuntimeException;
+    use Exception;
+    use GearmanJob;
 
     // TODO: Make server name function safe
     // TODO: Validate method names to be function safe
+
+    // Define server information for response headers
+    if(defined("KIMCHI_SERVER") == false)
+    {
+        if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . "package.json") == false)
+            throw new MissingComponentsException("The 'package.json' file was not found in the distribution");
+
+        $package = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "package.json"), true);
+        if($package == false)
+            throw new RuntimeException("Cannot decode 'package.json', package components may be corrupted");
+
+        define("KIMCHI_SERVER_VERSION", $package["package"]["version"]);
+        define("KIMCHI_SERVER_ORGANIZATION", $package["package"]["organization"]);
+        define("KIMCHI_SERVER_AUTHOR", $package["package"]["author"]);
+        define("KIMCHI_SERVER", true);
+    }
 
     /**
      * Class KimchiRPC
@@ -164,21 +180,38 @@
          *
          * @return Response[]
          * @throws CannotHandleRequestException
-         * @throws Exceptions\NoRequestHandlerForProtocolException
-         * @throws UnsupportedProtocolException
+         * @throws ServerException
          */
         public function handleRequest(): array
         {
+            if($this->server_mode !== ServerMode::Handler)
+                throw new ServerException("This instance's server mode is not a handler");
+
             if(http_response_code() == false)
                 throw new CannotHandleRequestException("The method can only be invoked if the instance is running from a web server environment");
 
-            $request_headers = Helper::getRequestHeaders();
-            $protocol = Helper::detectProtocol($this->getDefaultProtocol());
-            $request_handler = Helper::getRequestHandler($protocol);
-            $requests = $request_handler->fromRequest($_SERVER["REQUEST_METHOD"]);
+            try
+            {
+                $protocol = Helper::detectProtocol($this->getDefaultProtocol());
+                $request_handler = Helper::getRequestHandler($protocol);
+            }
+            catch (UnsupportedProtocolException | Exceptions\NoRequestHandlerForProtocolException $e)
+            {
+                Helper::plainTextResponse(400, "The server does not support the requested RCP protocol");
+                exit(1);
+            }
+
+            try
+            {
+                $requests = $request_handler->fromRequest($_SERVER["REQUEST_METHOD"]);
+            }
+            catch (Exception $e)
+            {
+                $request_handler->handleException($e, true);
+                exit(1);
+            }
 
             $responses = [];
-
             foreach($requests as $request)
                 $responses[] = $this->executeMethod($request);
 
@@ -189,23 +222,25 @@
          * Handles a response to the client
          *
          * @param Response[] $responses
-         * @throws Exceptions\NoRequestHandlerForProtocolException
-         * @throws UnsupportedProtocolException
+         * @throws ServerException
          */
         public function handleResponses(array $responses)
         {
-            $protocol = Helper::detectProtocol($this->getDefaultProtocol());
-            $request_handler = Helper::getRequestHandler($protocol);
+            if($this->server_mode !== ServerMode::Handler)
+                throw new ServerException("This instance's server mode is not a handler");
 
-            switch($protocol)
+            try
             {
-                case ProtocolType::JsonRpc2:
-                    $results = $request_handler->prepareResponse($responses);
-                    header("Content-Type: " . SupportedContentTypes::JsonRpc2);
-                    print(json_encode($results));
-                    break;
-
+                $protocol = Helper::detectProtocol($this->getDefaultProtocol());
+                $request_handler = Helper::getRequestHandler($protocol);
             }
+            catch (UnsupportedProtocolException | Exceptions\NoRequestHandlerForProtocolException $e)
+            {
+                Helper::plainTextResponse(400, "The server does not support the requested RCP protocol");
+                exit(1);
+            }
+
+            $request_handler->handleResponse($responses);
         }
 
         /**

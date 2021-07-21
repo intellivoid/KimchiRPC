@@ -153,6 +153,10 @@
                     case ServerErrorCodes::UnsupportedProtocol:
                         $error_object->Code = JsonStandardErrorCodes::ServerError;
                         break;
+
+                    default:
+                        $error_object->Code = $response->ErrorCode;
+                        break;
                 }
 
                 $response_object->Error = $error_object;

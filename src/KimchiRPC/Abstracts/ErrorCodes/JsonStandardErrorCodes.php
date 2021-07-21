@@ -40,7 +40,13 @@
         const InternalError = -32603;
 
         /**
-         * Reserved for implementation-defined server-errors.
+         * An array opf all the JSON Standard error codes
          */
-        const ServerError = "*";
+        const AllCodes = [
+            self::ParseError,
+            self::InvalidRequest,
+            self::MethodNotFound,
+            self::InvalidParams,
+            self::InternalError
+        ];
     }

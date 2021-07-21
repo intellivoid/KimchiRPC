@@ -9,5 +9,7 @@
      */
     abstract class ProtocolType
     {
+        const PlainText = "Plain Text";
+
         const JsonRpc2 = "JSON-RPC 2.0";
     }

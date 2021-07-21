@@ -3,6 +3,7 @@
 
     namespace KimchiRPC\Utilities;
 
+    use KimchiRPC\Abstracts\ProtocolContentTypes;
     use KimchiRPC\Abstracts\Types\ProtocolType;
     use KimchiRPC\Abstracts\Types\SupportedContentTypes;
     use KimchiRPC\Classes\RequestHandlers\JsonRpcRequestHandler;
@@ -73,6 +74,8 @@
          */
         public static function detectProtocol(string $default_protocol): string
         {
+            $request_headers = Helper::getRequestHeaders();
+
             if(isset($request_headers["Content-Type"]))
             {
                 switch($request_headers["Content-Type"])
@@ -88,5 +91,33 @@
             }
 
             return $default_protocol;
+        }
+
+        /**
+         * Sets the headers relating information about the server
+         *
+         * @param string $protocol
+         */
+        public static function setServerHeaders(string $protocol)
+        {
+            header("X-Powered-By: Kimchi-RPC Server v" . KIMCHI_SERVER_VERSION);
+            header("X-Kimchi-Version: " . KIMCHI_SERVER_VERSION);
+            header("X-Kimchi-Author: " . KIMCHI_SERVER_AUTHOR);
+            header("X-Kimchi-Organization: " . KIMCHI_SERVER_ORGANIZATION);
+            header("X-Protocol: " . $protocol);
+        }
+
+        /**
+         * Returns a plain text response as a fallback
+         *
+         * @param int $response_code
+         * @param string $message
+         */
+        public static function plainTextResponse(int $response_code, string $message)
+        {
+            http_response_code($response_code);
+            header("Content-Type: " . ProtocolContentTypes::PlainText);
+            Helper::setServerHeaders(ProtocolType::PlainText);
+            print($message);
         }
     }

@@ -4,7 +4,13 @@
     namespace KimchiRPC\Classes\RequestHandlers;
 
 
+    use Exception;
+    use KimchiRPC\Abstracts\ErrorCodes\JsonStandardErrorCodes;
+    use KimchiRPC\Abstracts\ErrorCodes\ServerErrorCodes;
+    use KimchiRPC\Abstracts\ProtocolContentTypes;
+    use KimchiRPC\Abstracts\Types\ProtocolType;
     use KimchiRPC\Abstracts\Types\RequestMethod;
+    use KimchiRPC\Abstracts\Types\SupportedContentTypes;
     use KimchiRPC\Exceptions\JsonRPC\InvalidRequestException;
     use KimchiRPC\Exceptions\Server\BadRequestException;
     use KimchiRPC\Exceptions\Server\MalformedRequestException;
@@ -12,6 +18,7 @@
     use KimchiRPC\Interfaces\RequestHandlerInterface;
     use KimchiRPC\Objects\JsonRPC\Request;
     use KimchiRPC\Objects\JsonRPC\Response;
+    use KimchiRPC\Utilities\Helper;
 
     /**
      * Class JsonRPC
@@ -89,6 +96,7 @@
          *
          * @param \KimchiRPC\Objects\Response[] $responses
          * @return array
+         * @inheritDoc
          */
         public function prepareResponse(array $responses): array
         {
@@ -105,6 +113,58 @@
             {
                 return Response::fromServerResponse($responses[0])->toArray();
             }
+        }
+
+        /**
+         * Handles the HTTP response and sets the appropriate headers
+         *
+         * @param \KimchiRPC\Objects\Response[] $responses
+         */
+        public function handleResponse(array $responses)
+        {
+            http_response_code(200);
+            header("Content-Type: " . ProtocolContentTypes::JsonRPC);
+            Helper::setServerHeaders(ProtocolType::JsonRpc2);
+            print(json_encode($this->prepareResponse($responses)));
+        }
+
+        /**
+         * Handles a exception response to the server
+         *
+         * @param Exception $e
+         * @param bool $suppress_non_internal
+         */
+        public function handleException(Exception $e, bool $suppress_non_internal=false)
+        {
+            // TODO: Make sure exceptions don't return sensitive information (Exception handling)
+            http_response_code(400);
+            header("Content-Type: " . ProtocolContentTypes::JsonRPC);
+            Helper::setServerHeaders(ProtocolType::JsonRpc2);
+
+            $response = new \KimchiRPC\Objects\Response();
+            $response->Protocol = ProtocolType::JsonRpc2;
+            $response->Success = false;
+
+            if($suppress_non_internal == false)
+            {
+                $response->ErrorMessage = $e->getMessage();
+                $response->ErrorCode = $e->getCode();
+            }
+            else
+            {
+                if(in_array($e->getCode(), ServerErrorCodes::AllCodes) || in_array($e->getCode(), JsonStandardErrorCodes::AllCodes))
+                {
+                    $response->ErrorMessage = $e->getMessage();
+                    $response->ErrorCode = $e->getCode();
+                }
+                else
+                {
+                    $response->ErrorMessage = "There was an internal server error while trying to handle your request";
+                    $response->ErrorCode = ServerErrorCodes::InternalError;
+                }
+            }
+
+            print(json_encode(Response::fromServerResponse($response)->toArray()));
         }
 
         /**

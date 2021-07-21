@@ -3,46 +3,41 @@
 
     namespace KimchiRPC\BuiltinMethods;
 
+
+    use Exception;
     use KimchiRPC\Interfaces\MethodInterface;
     use KimchiRPC\Objects\Request;
     use KimchiRPC\Objects\Response;
 
-    /**
-     * Class Ping
-     * @package KimchiRPC\BuiltinMethods\Server
-     */
-    class Ping implements MethodInterface
+    class ExceptionTest implements MethodInterface
     {
+
         /**
          * @inheritDoc
-         * @return string
          */
         public function getMethodName(): string
         {
-            return get_class($this);
+            return "Exception Test";
         }
 
         /**
          * @inheritDoc
-         * @return string
          */
         public function getMethod(): string
         {
-            return "server.ping";
+            return "server.exception_test";
         }
 
         /**
          * @inheritDoc
-         * @return string
          */
         public function getDescription(): string
         {
-            return "Pings the RPC server";
+            return "Tests the exception handling";
         }
 
         /**
          * @inheritDoc
-         * @return string
          */
         public function getVersion(): string
         {
@@ -50,14 +45,10 @@
         }
 
         /**
-         * @param Request $request
-         * @return Response
+         * @inheritDoc
          */
         public function execute(Request $request): Response
         {
-            $response = Response::fromRequest($request);
-            $response->ResultData = true;
-
-            return $response;
+            throw new Exception("This is an example error", 100);
         }
     }

@@ -12,6 +12,7 @@ ini_set('display_errors', '1');
     // Register functions
     $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\Ping()); // server.ping
     $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\GetRegisteredMethods($KimchiRPC)); // server.get_registered_methods
+    $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\ExceptionTest()); // server.exception_test
 
     // Start working
     $KimchiRPC->handleResponses($KimchiRPC->handleRequest());

@@ -37,6 +37,10 @@
         },
         {
             "required": true,
+            "file": "Abstracts/ProtocolContentTypes.php"
+        },
+        {
+            "required": true,
             "file": "Abstracts/ErrorCodes/JsonStandardErrorCodes.php"
         },
         {
@@ -58,6 +62,10 @@
         {
             "required": true,
             "file": "BuiltinMethods/GetRegisteredMethods.php"
+        },
+        {
+            "required": true,
+            "file": "BuiltinMethods/ExceptionTest.php"
         },
         {
             "required": true,
@@ -86,6 +94,14 @@
         {
             "required": true,
             "file": "Exceptions/RequestException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/NotImplementedException.php"
+        },
+        {
+            "required": true,
+            "file": "Exceptions/MissingComponentsException.php"
         },
         {
             "required": true,
