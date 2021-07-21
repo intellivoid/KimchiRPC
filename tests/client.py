@@ -6,7 +6,13 @@ from jsonrpcclient.requests import Request, Notification
 
 
 client = HTTPClient("http://127.0.0.1:5001/handler.php")
-response = client.send([Request("server.ping"), Notification("system.ping"), Request("server.get_registered_methods")])
+response = client.send([
+    Request("server.ping"),
+    Notification("system.ping"),
+    Request("server.get_registered_methods"),
+    Notification("server.exception_test"),
+    Request("server.exception_test"),
+])
 
 for data in response.data:
     if data.ok:

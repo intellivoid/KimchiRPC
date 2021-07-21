@@ -125,7 +125,14 @@
             http_response_code(200);
             header("Content-Type: " . ProtocolContentTypes::JsonRPC);
             Helper::setServerHeaders(ProtocolType::JsonRpc2);
-            print(json_encode($this->prepareResponse($responses)));
+            if(count($responses) == 0)
+            {
+                print("");
+            }
+            else
+            {
+                print(json_encode($this->prepareResponse($responses), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
         }
 
         /**
@@ -137,7 +144,6 @@
         public function handleException(Exception $e, bool $suppress_non_internal=false)
         {
             // TODO: Make sure exceptions don't return sensitive information (Exception handling)
-            http_response_code(400);
             header("Content-Type: " . ProtocolContentTypes::JsonRPC);
             Helper::setServerHeaders(ProtocolType::JsonRpc2);
 

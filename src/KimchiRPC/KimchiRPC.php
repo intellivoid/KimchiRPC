@@ -157,21 +157,23 @@
          * @param Request $request
          * @return Response
          */
-        public function executeMethod(Request $request): Response
+        public function executeMethod(Request $request): ?Response
         {
             if(isset($this->methods[$request->Method]) == false)
             {
+                if($request->ID == null)
+                    return null;
                 $truncated_method = Converter::truncateString($request->Method, 20);
                 return Response::fromException($request->ProtocolType, $request->ID, new MethodNotFoundException("The requested method '" . $truncated_method . "' was not found."));
             }
 
             try
             {
-                return $this->methods[$request->Method]->execute($request);
+                return ($request->ID == null ? null : $this->methods[$request->Method]->execute($request));
             }
             catch(Exception $e)
             {
-                return Response::fromException($request->ProtocolType, $request->ID, $e);
+                return ($request->ID == null ? null : Response::fromException($request->ProtocolType, $request->ID, $e));
             }
         }
 
@@ -204,6 +206,7 @@
             try
             {
                 $requests = $request_handler->fromRequest($_SERVER["REQUEST_METHOD"]);
+
             }
             catch (Exception $e)
             {
@@ -213,7 +216,12 @@
 
             $responses = [];
             foreach($requests as $request)
-                $responses[] = $this->executeMethod($request);
+            {
+                $response = $this->executeMethod($request);
+                if($response !== null)
+                    $responses[] = $response;
+
+            }
 
             return $responses;
         }
