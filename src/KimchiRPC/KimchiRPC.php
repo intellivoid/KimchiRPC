@@ -147,7 +147,6 @@
                 $this->server_name, function(GearmanJob $job) use ($rpc_server)
                 {
                     $request = Request::fromArray(Converter::decode($job->workload()));
-                    var_dump($request->Method);
                     $response = $rpc_server->executeMethod($request);
 
                     if($response == null)
