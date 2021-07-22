@@ -128,11 +128,15 @@
         {
             $method_reordered = array_keys($this->methods);
             sort($method_reordered);
+            $methods_clean = [];
 
             foreach($method_reordered as $method_name)
-                $method_reordered[$method_name] = $this->methods[$method_name];
+            {
+                if(is_int($method_name) == false)
+                    $methods_clean[$method_name] = $this->methods[$method_name];
+            }
 
-            $this->methods = $method_reordered;
+            $this->methods = $methods_clean;
         }
 
         /**

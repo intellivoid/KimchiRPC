@@ -44,14 +44,5 @@
         {
             return (strlen($input) > $length) ? substr($input,0, $length).'...' : $input;
         }
-        
-         * Returns decoded data using ZiProto
-         *
-         * @param string $data
-         * @return array
-         */
-        public static function decode(string $data): array
-        {
-            return ZiProto::decode(base64_decode($data));
-        }
+
     }
