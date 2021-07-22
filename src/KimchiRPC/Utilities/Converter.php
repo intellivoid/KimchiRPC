@@ -3,6 +3,8 @@
 
     namespace KimchiRPC\Utilities;
 
+    use ZiProto\ZiProto;
+
     /**
      * Class Converter
      * @package KimchiRPC\Utilities
@@ -41,5 +43,27 @@
         public static function truncateString(string $input, int $length): string
         {
             return (strlen($input) > $length) ? substr($input,0, $length).'...' : $input;
+        }
+
+        /**
+         * Encodes data using ZiProto
+         *
+         * @param array $data
+         * @return string
+         */
+        public static function encode(array $data): string
+        {
+            return base64_encode(ZiProto::encode($data));
+        }
+
+        /**
+         * Returns decoded data using ZiProto
+         *
+         * @param string $data
+         * @return array
+         */
+        public static function decode(string $data): array
+        {
+            return ZiProto::decode(base64_decode($data));
         }
     }

@@ -8,6 +8,7 @@
     use BackgroundWorker\Exceptions\UnexpectedTermination;
     use BackgroundWorker\Exceptions\WorkerException;
     use BackgroundWorker\Exceptions\WorkersAlreadyRunningException;
+    use GearmanTask;
     use KimchiRPC\Abstracts\ServerMode;
     use KimchiRPC\Abstracts\Types\ProtocolType;
     use KimchiRPC\Abstracts\Types\SupportedContentTypes;
@@ -140,15 +141,21 @@
          */
         private function initializeWorker()
         {
-            foreach($this->methods as $method_name => $method)
-            {
-                $this->getBackgroundWorker()->getWorker()->getGearmanWorker()->addFunction(
-                    $this->server_name . "." . $method_name, function(GearmanJob $job) use ($method)
-                    {
-                        return ZiProto::encode($method->execute(Request::fromArray(ZiProto::decode($job->workload())))->toArray());
-                    }
-                );
-            }
+            $rpc_server = $this;
+
+            $this->getBackgroundWorker()->getWorker()->getGearmanWorker()->addFunction(
+                $this->server_name, function(GearmanJob $job) use ($rpc_server)
+                {
+                    $request = Request::fromArray(Converter::decode($job->workload()));
+                    var_dump($request->Method);
+                    $response = $rpc_server->executeMethod($request);
+
+                    if($response == null)
+                        return null;
+
+                    return Converter::encode($response->toArray(true));
+                }
+            );
         }
 
         /**
@@ -215,12 +222,34 @@
             }
 
             $responses = [];
-            foreach($requests as $request)
-            {
-                $response = $this->executeMethod($request);
-                if($response !== null)
-                    $responses[] = $response;
 
+            if($this->enable_background_worker)
+            {
+                $this->getBackgroundWorker()->getClient()->getGearmanClient()->setCompleteCallback(
+                    function(GearmanTask $task) use (&$responses)
+                    {
+                        if($task->data() !== null && strlen($task->data()) > 0)
+                            $responses[] = Response::fromArray(Converter::decode($task->data()));
+                    });
+
+                foreach($requests as $request)
+                {
+                    $this->getBackgroundWorker()->getClient()->getGearmanClient()->addTask(
+                        $this->server_name, Converter::encode($request->toArray(true))
+                    );
+                }
+
+                $this->getBackgroundWorker()->getClient()->getGearmanClient()->runTasks();
+            }
+            else
+            {
+                foreach($requests as $request)
+                {
+                    $response = $this->executeMethod($request);
+                    if($response !== null)
+                        $responses[] = $response;
+
+                }
             }
 
             return $responses;

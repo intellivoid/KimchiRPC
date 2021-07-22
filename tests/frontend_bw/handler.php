@@ -13,10 +13,5 @@
     $KimchiRPC->enableBackgroundWorker();
     $KimchiRPC->getBackgroundWorker()->getClient()->addServer();
 
-    // Register functions
-    $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\Ping()); // server.ping
-    $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\GetRegisteredMethods($KimchiRPC)); // server.get_registered_methods
-    $KimchiRPC->registerMethod(new \KimchiRPC\BuiltinMethods\ExceptionTest()); // server.exception_test
-
     // Handle the requests and emits a response.
     $KimchiRPC->handle();

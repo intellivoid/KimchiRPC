@@ -14,4 +14,4 @@
     );
 
     // Start service
-    $KimchiRPC->startService(__DIR__ . DIRECTORY_SEPARATOR . "worker.php", 10);
+    $KimchiRPC->startService(__DIR__ . DIRECTORY_SEPARATOR . "worker.php", 50);

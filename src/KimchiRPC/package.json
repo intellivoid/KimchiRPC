@@ -13,6 +13,12 @@
                 "version": "latest",
                 "source": "default@github/intellivoid/BackgroundWorker",
                 "required": true
+            },
+            {
+                "package": "net.intellivoid.ziproto",
+                "version": "latest",
+                "source": "default@github/intellivoid/ZiProto",
+                "required": true
             }
         ],
         "configuration": {
@@ -58,6 +64,10 @@
         {
             "required": true,
             "file": "BuiltinMethods/Ping.php"
+        },
+        {
+            "required": true,
+            "file": "BuiltinMethods/SleepTest.php"
         },
         {
             "required": true,

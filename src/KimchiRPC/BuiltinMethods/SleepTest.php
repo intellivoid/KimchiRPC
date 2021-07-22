@@ -9,10 +9,10 @@
     use KimchiRPC\Objects\Response;
 
     /**
-     * Class ExceptionTest
+     * Class SleepTest
      * @package KimchiRPC\BuiltinMethods
      */
-    class ExceptionTest implements MethodInterface
+    class SleepTest implements MethodInterface
     {
 
         /**
@@ -20,7 +20,7 @@
          */
         public function getMethodName(): string
         {
-            return "Exception Test";
+            return "Sleep Test";
         }
 
         /**
@@ -28,7 +28,7 @@
          */
         public function getMethod(): string
         {
-            return "server.exception_test";
+            return "server.sleep_test";
         }
 
         /**
@@ -36,7 +36,7 @@
          */
         public function getDescription(): string
         {
-            return "Tests the exception handling";
+            return "Tests the sleep handling";
         }
 
         /**
@@ -52,6 +52,11 @@
          */
         public function execute(Request $request): Response
         {
-            throw new Exception("This is an example error", 100);
+            sleep(3);
+
+            $response = Response::fromRequest($request);
+            $response->ResultData = "Slept for 3 seconds";
+
+            return $response;
         }
     }
