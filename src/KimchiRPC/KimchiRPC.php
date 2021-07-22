@@ -252,6 +252,17 @@
         }
 
         /**
+         * Handles the requests and gives the client a proper response
+         *
+         * @throws CannotHandleRequestException
+         * @throws ServerException
+         */
+        public function handle()
+        {
+            $this->handleResponses($this->handleRequest());
+        }
+
+        /**
          * Begins working and listening for incoming jobs
          *
          * @param bool $blocking
@@ -342,13 +353,19 @@
         }
 
         /**
-         *
-         *
-         * @param bool $enable_background_worker
+         * Enables BackgroundWorker to be used
          */
-        public function setEnableBackgroundWorker(bool $enable_background_worker): void
+        public function enableBackgroundWorker(): void
         {
-            $this->enable_background_worker = $enable_background_worker;
+            $this->enable_background_worker = true;
+        }
+
+        /**
+         * Disables BackgroundWorker
+         */
+        public function disableBackgroundWorker(): void
+        {
+            $this->enable_background_worker = false;
         }
 
         /**
