@@ -11,7 +11,6 @@
     use GearmanTask;
     use KimchiRPC\Abstracts\ServerMode;
     use KimchiRPC\Abstracts\Types\ProtocolType;
-    use KimchiRPC\Abstracts\Types\SupportedContentTypes;
     use KimchiRPC\Exceptions\CannotHandleRequestException;
     use KimchiRPC\Exceptions\MethodAlreadyRegistered;
     use KimchiRPC\Exceptions\MissingComponentsException;
@@ -23,10 +22,10 @@
     use KimchiRPC\Objects\Response;
     use KimchiRPC\Utilities\Converter;
     use KimchiRPC\Utilities\Helper;
-    use PpmZiProto\ZiProto;
     use RuntimeException;
     use Exception;
     use GearmanJob;
+    use ZiProto\ZiProto;
 
     // TODO: Make server name function safe
     // TODO: Validate method names to be function safe
@@ -146,13 +145,13 @@
             $this->getBackgroundWorker()->getWorker()->getGearmanWorker()->addFunction(
                 $this->server_name, function(GearmanJob $job) use ($rpc_server)
                 {
-                    $request = Request::fromArray(Converter::decode($job->workload()));
+                    $request = Request::fromArray(ZiProto::decode($job->workload()));
                     $response = $rpc_server->executeMethod($request);
 
                     if($response == null)
                         return null;
 
-                    return Converter::encode($response->toArray(true));
+                    return ZiProto::encode($response->toArray(true));
                 }
             );
         }
@@ -228,13 +227,13 @@
                     function(GearmanTask $task) use (&$responses)
                     {
                         if($task->data() !== null && strlen($task->data()) > 0)
-                            $responses[] = Response::fromArray(Converter::decode($task->data()));
+                            $responses[] = Response::fromArray(ZiProto::decode($task->data()));
                     });
 
                 foreach($requests as $request)
                 {
                     $this->getBackgroundWorker()->getClient()->getGearmanClient()->addTask(
-                        $this->server_name, Converter::encode($request->toArray(true))
+                        $this->server_name, ZiProto::encode($request->toArray(true))
                     );
                 }
 
