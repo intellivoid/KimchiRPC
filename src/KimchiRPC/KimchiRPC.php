@@ -290,6 +290,12 @@
          */
         public function handle()
         {
+            if($this->server_mode !== ServerMode::Handler)
+                throw new ServerException("This instance's server mode is not a handler");
+
+            if(http_response_code() == false)
+                throw new CannotHandleRequestException("The method can only be invoked if the instance is running from a web server environment");
+
             $this->handleResponses($this->handleRequest());
         }
 

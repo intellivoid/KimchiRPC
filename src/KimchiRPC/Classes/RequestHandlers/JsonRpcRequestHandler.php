@@ -202,11 +202,8 @@
                     if(isset($_GET["method"]) == false)
                         throw new BadRequestException("Missing 'method' parameter");
 
-                    if(isset($_GET["id"]) == false)
-                        throw new BadRequestException("Missing 'id' parameter");
-
                     $parameters = [];
-                    if(isset($_GET["parameters"]) == false)
+                    if(isset($_GET["parameters"]))
                     {
                         $parameters = json_decode($_GET["parameters"], true);
                         if($parameters == false)
@@ -222,7 +219,7 @@
                     $request_object = new Request();
                     $client_ip = Helper::getClientIP();
                     $request_object->Method = $_GET["method"];
-                    $request_object->ID = $_GET["id"];
+                    $request_object->ID = ($_GET["id"] ?? null);
                     $request_object->Parameters = $parameters;
 
                     return [\KimchiRPC\Objects\Request::fromJsonRpcRequest($request_object, $client_ip)];
