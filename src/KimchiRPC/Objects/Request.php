@@ -15,6 +15,13 @@
     class Request
     {
         /**
+         * The IP address of the client making the request
+         *
+         * @var string|null
+         */
+        public $ClientIP;
+
+        /**
          * The ID of the request defined by the client
          *
          * @var int
@@ -77,12 +84,14 @@
                     0x002 => $this->ProtocolType,
                     0x003 => $protocol_object,
                     0x004 => $this->Method,
-                    0x005 => $this->Parameters
+                    0x005 => $this->Parameters,
+                    0x006 => $this->ClientIP,
                 ];
             }
             else
             {
                 return [
+                    "client_ip" => $this->ClientIP,
                     "id" => $this->ID,
                     "protocol_type" => $this->ProtocolType,
                     "protocol_object" => $protocol_object,
@@ -142,6 +151,11 @@
                 }
             }
 
+            if(isset($data["client_ip"]))
+                $request_object->ClientIP = $data["client_ip"];
+            if(isset($data[0x006]))
+                $request_object->ClientIP = $data[0x006];
+
             return $request_object;
         }
 
@@ -149,11 +163,13 @@
          * Constructs standard request from a Json RPC request
          *
          * @param JsonRPC\Request $request
+         * @param string|null $ip_address
          * @return Request
          */
-        public static function fromJsonRpcRequest(\KimchiRPC\Objects\JsonRPC\Request $request): Request
+        public static function fromJsonRpcRequest(\KimchiRPC\Objects\JsonRPC\Request $request, ?string $ip_address=null): Request
         {
             $request_object = new Request();
+            $request_object->ClientIP = $ip_address;
             $request_object->ID = $request->ID;
             $request_object->ProtocolType = ProtocolType::JsonRpc2;
             $request_object->Method = $request->Method;

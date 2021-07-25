@@ -64,12 +64,13 @@
         {
             /** @var Request[] $results */
             $results = [];
+            $client_ip = Helper::getClientIP();
 
             if($this->isBatchRequest($data))
             {
                 foreach($data as $datum)
                 {
-                    $results[] = \KimchiRPC\Objects\Request::fromJsonRpcRequest(Request::fromArray($datum));
+                    $results[] = \KimchiRPC\Objects\Request::fromJsonRpcRequest(Request::fromArray($datum), $client_ip);
                 }
 
                 if($validate)
@@ -81,7 +82,7 @@
             }
             else
             {
-                $r = \KimchiRPC\Objects\Request::fromJsonRpcRequest(Request::fromArray($data));
+                $r = \KimchiRPC\Objects\Request::fromJsonRpcRequest(Request::fromArray($data), $client_ip);
                 if($validate)
                     $r->ProtocolRequestObject->validate();
 
@@ -219,11 +220,12 @@
                     }
 
                     $request_object = new Request();
+                    $client_ip = Helper::getClientIP();
                     $request_object->Method = $_GET["method"];
                     $request_object->ID = $_GET["id"];
                     $request_object->Parameters = $parameters;
 
-                    return [\KimchiRPC\Objects\Request::fromJsonRpcRequest($request_object)];
+                    return [\KimchiRPC\Objects\Request::fromJsonRpcRequest($request_object, $client_ip)];
 
                 default:
                     throw new UnsupportedHttpRequestMethodException("The request method '" . $request_method . "' is not supported");
