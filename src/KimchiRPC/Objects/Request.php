@@ -38,7 +38,7 @@
         /**
          * The ID of the request defined by the client
          *
-         * @var int
+         * @var int|string|null
          */
         public $ID;
 
@@ -87,8 +87,6 @@
          */
         public function toArray(bool $compact=false): array
         {
-            $protocol_object = null;
-
             switch($this->ProtocolType)
             {
                 case ProtocolType::JsonRpc2:
@@ -201,8 +199,7 @@
             if($request->ID == null)
                 $request_object->BackgroundRequest = true;
 
-            if($request_object->Method == null)
-                $request_object->IsValidRequest = false;
+            $request_object->IsValidRequest = $request->isValid();
 
             return $request_object;
         }

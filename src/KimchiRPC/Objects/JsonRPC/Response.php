@@ -87,7 +87,7 @@
                 $results["result"] = $this->Result;
             }
 
-            $results["id"] = (int)$this->ID;
+            $results["id"] = $this->ID;
 
             return $results;
         }
@@ -113,6 +113,8 @@
 
             if(isset($data["id"]))
                 $response_object->ID = $data["id"];
+
+            return $response_object;
         }
 
         /**

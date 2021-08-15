@@ -17,6 +17,13 @@
     class Request
     {
         /**
+         * Indicates if this request object is valid or not
+         *
+         * @var bool
+         */
+        private $IsValid;
+
+        /**
          * A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0".
          *
          * @var string
@@ -48,6 +55,22 @@
          * @var int|null
          */
         public $ID;
+
+        /**
+         * Request Constructor
+         */
+        public function __construct()
+        {
+            $this->IsValid = true;
+        }
+
+        /**
+         * @return bool
+         */
+        public function isValid(): bool
+        {
+            return $this->IsValid;
+        }
 
         /**
          * Validates the request object values to abid by the standard, if something is out of place then a
@@ -87,6 +110,9 @@
                     throw new InvalidRequestException(
                         "The property 'params' can be array or null, got " . strtolower(gettype($this->ID)));
             }
+
+            if($this->IsValid == false)
+                throw new InvalidRequestException("Invalid Request");
         }
 
         /**
@@ -150,16 +176,27 @@
             $request_object = new Request();
 
             if(isset($data["jsonrpc"]))
+            {
                 $request_object->JsonRPC = $data["jsonrpc"];
+            }
+            else
+            {
+                $request_object->IsValid = false;
+            }
 
             if(isset($data["method"]))
+            {
                 $request_object->Method = $data["method"];
+            }
+            else
+            {
+                $request_object->IsValid = false;
+            }
 
             if(isset($data["params"]))
                 $request_object->Parameters = $data["params"];
 
-            if(isset($data["id"]))
-                $request_object->ID = $data["id"];
+            $request_object->ID = $data["id"];
 
             return $request_object;
         }

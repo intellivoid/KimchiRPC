@@ -169,23 +169,19 @@
          */
         public function executeMethod(Request $request): ?Response
         {
-            if($request->ID == null)
-                return null;
-
-            if(is_numeric($request->ID))
-            {
-                $request->ID = (int)$request->ID;
-            }
-            else
-            {
-                return null;
-            }
-
             if($request->IsValidRequest == false)
-                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid Request because of validation fail"));
+                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid Request"));
+
+            // Avoid unsupported ID types
+            if(Helper::isValidType($request->ID, ["string", "integer", "null"]) == false)
+                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid ID Type"));
 
             if(isset($this->methods[$request->Method]) == false)
             {
+                // Ignore notification requests
+                if(strtolower(gettype($request->ID)) == "null")
+                    return null;
+
                 $truncated_method = Converter::truncateString($request->Method, 20);
                 return Response::fromException($request->ProtocolType, $request->ID, new MethodNotFoundException("The requested method '" . $truncated_method . "' was not found."));
             }

@@ -122,6 +122,21 @@
         }
 
         /**
+         * Determines if the type is a valid type
+         *
+         * @param $input
+         * @param array|string[] $types
+         * @return bool
+         */
+        public static function isValidType($input, array $types=["string", "integer", "null"]): bool
+        {
+            if(in_array(strtolower(gettype($input)), $types))
+                return true;
+
+            return false;
+        }
+
+        /**
          * Attempts to get the Client's IP Address
          *
          * @return string

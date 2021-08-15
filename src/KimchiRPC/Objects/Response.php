@@ -150,11 +150,11 @@
          * Constructs a response from an exception
          *
          * @param ProtocolType|string $protocol_type
-         * @param int|null $id
+         * @param int|string|null $id
          * @param Exception $exception
          * @return Response
          */
-        public static function fromException(string $protocol_type, ?int $id, Exception $exception): Response
+        public static function fromException(string $protocol_type, $id, Exception $exception): Response
         {
             $response_object = new Response();
 
