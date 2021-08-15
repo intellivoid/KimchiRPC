@@ -208,7 +208,7 @@
             }
             catch (UnsupportedProtocolException | Exceptions\NoRequestHandlerForProtocolException $e)
             {
-                Helper::plainTextResponse(400, "The server does not support the requested RCP protocol");
+                Helper::plainTextResponse(400, "The server does not support the requested RPC protocol");
                 exit(1);
             }
 
@@ -275,7 +275,7 @@
             }
             catch (UnsupportedProtocolException | Exceptions\NoRequestHandlerForProtocolException $e)
             {
-                Helper::plainTextResponse(400, "The server does not support the requested RCP protocol");
+                Helper::plainTextResponse(400, "The server does not support the requested RPC protocol");
                 exit(1);
             }
 
