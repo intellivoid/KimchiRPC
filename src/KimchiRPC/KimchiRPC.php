@@ -80,6 +80,11 @@
         private $server_mode;
 
         /**
+         * @var int
+         */
+        private $maximum_requests_per_batch;
+
+        /**
          * @var BackgroundWorker
          */
         private $background_worker;
@@ -106,6 +111,7 @@
             $this->server_mode = ServerMode::Handler;
             $this->worker_initialized = false;
             $this->supervisor_initialized = false;
+            $this->maximum_requests_per_batch = 0;
         }
 
         /**
@@ -232,6 +238,12 @@
             {
                 $request_handler->handleException($e, true);
                 exit(1);
+            }
+
+            // Truncate the requests if it exceeds the amount of requests allowed
+            if($this->maximum_requests_per_batch > 0 && count($requests) > $this->maximum_requests_per_batch)
+            {
+                $requests = array_slice($requests, 0, ($this->maximum_requests_per_batch - count($requests)));
             }
 
             $responses = [];
@@ -471,5 +483,21 @@
         public function getRegisteredMethods(): array
         {
             return $this->methods;
+        }
+
+        /**
+         * @return int
+         */
+        public function getMaximumRequestsPerBatch(): int
+        {
+            return $this->maximum_requests_per_batch;
+        }
+
+        /**
+         * @param int $maximum_requests_per_batch
+         */
+        public function setMaximumRequestsPerBatch(int $maximum_requests_per_batch): void
+        {
+            $this->maximum_requests_per_batch = $maximum_requests_per_batch;
         }
     }
