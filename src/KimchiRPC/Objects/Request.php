@@ -15,6 +15,20 @@
     class Request
     {
         /**
+         * Indicates if the request is valid or not, if not valid it won't be sent to the worker.
+         *
+         * @var bool
+         */
+        public $IsValidRequest;
+
+        /**
+         * Indicates if the request should be executed in the background
+         *
+         * @var bool
+         */
+        public $BackgroundRequest;
+
+        /**
          * The IP address of the client making the request
          *
          * @var string|null
@@ -175,6 +189,12 @@
             $request_object->Method = $request->Method;
             $request_object->Parameters = $request->Parameters;
             $request_object->ProtocolRequestObject = $request;
+
+            if($request->ID == null)
+                $request_object->BackgroundRequest = true;
+
+            if($request_object->Method == null)
+                $request_object->IsValidRequest = false;
 
             return $request_object;
         }

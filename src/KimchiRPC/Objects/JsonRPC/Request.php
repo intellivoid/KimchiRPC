@@ -45,7 +45,7 @@
          * If it is not included it is assumed to be a notification. The value SHOULD normally not be Null
          * and Numbers SHOULD NOT contain fractional parts
          *
-         * @var string|int|null
+         * @var int|null
          */
         public $ID;
 

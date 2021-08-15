@@ -151,7 +151,8 @@
                         break;
 
                     case ServerErrorCodes::UnsupportedProtocol:
-                        $error_object->Code = JsonStandardErrorCodes::ServerError;
+                    case ServerErrorCodes::BadRequestException:
+                        $error_object->Code = JsonStandardErrorCodes::InvalidRequest;
                         break;
 
                     default:

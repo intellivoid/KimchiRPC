@@ -33,6 +33,14 @@
          */
         public function isBatchRequest(array $data): bool
         {
+            // It's an empty request
+            if(count($data) == 0)
+                return false;
+
+            // It's a single request
+            if(isset($data["jsonrpc"]))
+                return false;
+
             foreach($data as $datum)
             {
                 if(gettype($datum) !== "array")

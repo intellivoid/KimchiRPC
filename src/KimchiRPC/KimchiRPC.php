@@ -14,6 +14,7 @@
     use KimchiRPC\Exceptions\CannotHandleRequestException;
     use KimchiRPC\Exceptions\MethodAlreadyRegistered;
     use KimchiRPC\Exceptions\MissingComponentsException;
+    use KimchiRPC\Exceptions\Server\BadRequestException;
     use KimchiRPC\Exceptions\Server\MethodNotFoundException;
     use KimchiRPC\Exceptions\Server\UnsupportedProtocolException;
     use KimchiRPC\Exceptions\ServerException;
@@ -168,21 +169,23 @@
          */
         public function executeMethod(Request $request): ?Response
         {
+            if($request->ID == null)
+                return null;
+
+            if(is_numeric($request->ID))
+            {
+                $request->ID = (int)$request->ID;
+            }
+            else
+            {
+                return null;
+            }
+
+            if($request->IsValidRequest == false)
+                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid Request"));
+
             if(isset($this->methods[$request->Method]) == false)
             {
-                if($request->ID == null)
-                    return null;
-
-                if(is_numeric($request->ID))
-                {
-                    /** @noinspection PhpCastIsUnnecessaryInspection */
-                    $request->ID = (int)$request->ID;
-                }
-                else
-                {
-                    return null;
-                }
-
                 $truncated_method = Converter::truncateString($request->Method, 20);
                 return Response::fromException($request->ProtocolType, $request->ID, new MethodNotFoundException("The requested method '" . $truncated_method . "' was not found."));
             }
@@ -247,9 +250,19 @@
 
                 foreach($requests as $request)
                 {
-                    $this->getBackgroundWorker()->getClient()->getGearmanClient()->addTask(
-                        $this->server_name, ZiProto::encode($request->toArray(true))
-                    );
+                    if($request->BackgroundRequest)
+                    {
+                        $this->getBackgroundWorker()->getClient()->getGearmanClient()->doBackground(
+                            $this->server_name, ZiProto::encode($request->toArray(true))
+                        );
+                    }
+                    else
+                    {
+                        $this->getBackgroundWorker()->getClient()->getGearmanClient()->addTask(
+                            $this->server_name, ZiProto::encode($request->toArray(true))
+                        );
+                    }
+
                 }
 
                 $this->getBackgroundWorker()->getClient()->getGearmanClient()->runTasks();
