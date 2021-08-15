@@ -71,6 +71,14 @@
         public $Parameters;
 
         /**
+         * 
+         */
+        public function __construct()
+        {
+            $this->IsValidRequest = true;
+        }
+
+        /**
          * Returns an array representation of the object
          *
          * @param bool $compact Returns a compact representation for ZiProto serialization

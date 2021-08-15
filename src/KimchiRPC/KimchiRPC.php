@@ -182,7 +182,7 @@
             }
 
             if($request->IsValidRequest == false)
-                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid Request"));
+                return Response::fromException($request->ProtocolType, $request->ID, new BadRequestException("Invalid Request because of validation fail"));
 
             if(isset($this->methods[$request->Method]) == false)
             {
