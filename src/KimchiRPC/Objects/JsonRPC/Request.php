@@ -68,13 +68,21 @@
             switch(strtolower(gettype($this->ID)))
             {
                 case "string":
+                    if(is_numeric($this->ID) == false)
+                        throw new InvalidRequestException(
+                            "The property 'id' must be a integer or null. got " . strtolower(gettype($this->ID)));
+
+                    // Cast it as int32
+                    $this->ID = (int)$this->ID;
+                    break;
+
                 case "integer":
                 case "null":
                     break;
 
                 default:
                     throw new InvalidRequestException(
-                        "The property 'id' can be string, integer or null. got " . strtolower(gettype($this->ID)));
+                        "The property 'id' must be a integer or null. got " . strtolower(gettype($this->ID)));
             }
 
             switch(strtolower(gettype($this->Parameters)))
