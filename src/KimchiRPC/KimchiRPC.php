@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPropertyOnlyWrittenInspection */
     /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace KimchiRPC;
