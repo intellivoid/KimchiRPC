@@ -172,6 +172,9 @@
             {
                 if($request->ID == null)
                     return null;
+
+                /** @noinspection PhpCastIsUnnecessaryInspection */
+                $request->ID = (int)$request->ID;
                 $truncated_method = Converter::truncateString($request->Method, 20);
                 return Response::fromException($request->ProtocolType, $request->ID, new MethodNotFoundException("The requested method '" . $truncated_method . "' was not found."));
             }
