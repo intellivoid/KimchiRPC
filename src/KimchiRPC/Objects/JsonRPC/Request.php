@@ -84,9 +84,17 @@
                 throw new InvalidRequestException(
                     "The property 'jsonrpc' must be '2.0', got an unsupported version");
 
-            if($this->Method == null || gettype($this->Method) !== "string")
+            if(gettype($this->Method) == 'string')
+            {
+                if($this->Method == null)
+                    throw new InvalidRequestException(
+                        "The property 'method' cannot be empty");
+            }
+            else
+            {
                 throw new InvalidRequestException(
                     "The property 'method' must be string, got " . strtolower(gettype($this->Method)));
+            }
 
             switch(strtolower(gettype($this->ID)))
             {
