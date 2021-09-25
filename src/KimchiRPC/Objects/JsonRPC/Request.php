@@ -203,8 +203,9 @@
 
             if(isset($data["params"]))
                 $request_object->Parameters = $data["params"];
-
-            $request_object->ID = $data["id"];
+            
+            if(isset($data['id']))
+                $request_object->ID = $data["id"];
 
             return $request_object;
         }
