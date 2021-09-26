@@ -419,6 +419,8 @@
          */
         public function isEnableBackgroundWorker(): bool
         {
+            if($this->enable_background_worker == null)
+                return false;
             return $this->enable_background_worker;
         }
 
