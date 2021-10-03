@@ -104,6 +104,7 @@
             header("X-Kimchi-Version: " . KIMCHI_SERVER_VERSION);
             header("X-Kimchi-Author: " . KIMCHI_SERVER_AUTHOR);
             header("X-Kimchi-Organization: " . KIMCHI_SERVER_ORGANIZATION);
+            header("Access-Control-Allow-Origin: *");
             header("X-Protocol: " . $protocol);
         }
 
