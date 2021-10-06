@@ -6,6 +6,7 @@
     namespace KimchiRPC;
 
     use BackgroundWorker\BackgroundWorker;
+    use BackgroundWorker\Exceptions\ServerNotReachableException;
     use BackgroundWorker\Exceptions\UnexpectedTermination;
     use BackgroundWorker\Exceptions\WorkerException;
     use BackgroundWorker\Exceptions\WorkersAlreadyRunningException;
@@ -153,8 +154,8 @@
         private function initializeWorker()
         {
             $rpc_server = $this;
-
-            $this->getBackgroundWorker()->getWorker()->getGearmanWorker()->addFunction(
+            $this->getBackgroundWorker()->getWorker()->setAutoRestart(true);
+            $this->getBackgroundWorker()->getWorker()->addFunction(
                 $this->server_name, function(GearmanJob $job) use ($rpc_server)
                 {
                     $request = Request::fromArray(ZiProto::decode($job->workload()));
@@ -360,6 +361,7 @@
          * @throws ServerException
          * @throws UnexpectedTermination
          * @throws WorkersAlreadyRunningException
+         * @throws ServerNotReachableException
          */
         public function startService(string $worker_path, int $instances)
         {
