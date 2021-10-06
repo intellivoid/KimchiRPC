@@ -2,7 +2,7 @@
     "package": {
         "package_name": "net.intellivoid.kimchi_rpc",
         "name": "KimchiRPC",
-        "version": "1.0.0.8",
+        "version": "1.0.0.9",
         "author": "Zi Xing Narrakas",
         "organization": "Intellivoid Technologies",
         "description": "The RPC server that goes good with anything, even toothpaste!",
